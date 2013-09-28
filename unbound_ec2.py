@@ -89,7 +89,7 @@ def handle_forward(id, event, qstate, qdata):
         qstate.return_rcode = RCODE_NOERROR
         for instance in instances:
             address = (instance.ip_address or instance.private_ip_address).encode("ascii")
-            record = "%s %d IN A %s" % (qname, ttl, address)
+            record = "%s %d IN A %s" % (qname, TTL, address)
             msg.answer.append(record)
 
     if not msg.set_return_msg(qstate):
