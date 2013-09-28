@@ -60,6 +60,8 @@ You can also define `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY` entries in the 
 
 `unbound_ec2` queries the EC2 API to answer requests about names inside the specified `ZONE`. All other requests are handled normally by Unbound's caching resolver. For requests for names within the specified `ZONE`, `unbound_ec2` calls [`DescribeInstances`](http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeInstances.html) and filters the results by instance state and tag name. Only instances in the `running` state with a `Name` tag matching the DNS request will be returned by the API query. When more than one instance matches the `DescribeInstances` query, `unbound_ec2` will return multiple A records in a round-robin. The query results are not cached by Unbound, though a TTL (default: five minutes) is defined to encourage well-behaved clients to cache the information themselves.
 
+Public addresses, IPv6, and reverse DNS lookups (PTR) are not yet supported.
+
 ## Testing
 
 This repository includes a test configuration. Run it as follows:
