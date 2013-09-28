@@ -32,7 +32,9 @@ def init(id, cfg):
     global TTL
     global ec2
 
-    envdir(envdir_path)
+    if os.path.isdir(envdir_path):    
+        envdir(envdir_path)
+
     AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
     ZONE = os.environ.get("ZONE", ".example.com.")
     TTL = os.environ.get("TTL", "300")
