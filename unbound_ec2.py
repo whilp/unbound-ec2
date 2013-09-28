@@ -18,6 +18,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 """
 
 import os
+import random
+
 import boto.ec2
 
 envdir_path = "/etc/unbound/env"
@@ -87,6 +89,7 @@ def handle_forward(id, event, qstate, qdata):
         qstate.return_rcode = RCODE_NXDOMAIN
     else:
         qstate.return_rcode = RCODE_NOERROR
+        random.shuffle(instances)
         for instance in instances:
             address = (instance.ip_address or instance.private_ip_address).encode("ascii")
             record = "%s %d IN A %s" % (qname, TTL, address)
