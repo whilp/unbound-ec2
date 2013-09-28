@@ -78,7 +78,7 @@ def handle_forward(id, event, qstate, qdata):
 
     reservations = ec2.get_all_instances(filters={
         "instance-state-name": "running",
-        "tag:Name": name.strip("."),
+        "tag:Name": qname.strip("."),
     })
     instances = [instance for reservation in reservations
                  for instance in reservation.instances]
@@ -89,7 +89,7 @@ def handle_forward(id, event, qstate, qdata):
         qstate.return_rcode = RCODE_NOERROR
         for instance in instances:
             address = (instance.ip_address or instance.private_ip_address).encode("ascii")
-            record = "%s %d IN A %s" % (name, ttl, address)
+            record = "%s %d IN A %s" % (qname, ttl, address)
             msg.answer.append(record)
 
     if not msg.set_return_msg(qstate):
