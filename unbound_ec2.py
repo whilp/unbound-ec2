@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # coding: utf-8
-# sudo apt-get install unbound python-unbound
 
 import os
 import boto.ec2
@@ -19,6 +18,7 @@ def init(id, cfg):
         authoritative += "."
     
     ec2 = boto.ec2.connect_to_region(region)
+
     log_info("unbound_ec2: connected to AWS region %s" % region)
     log_info("unbound_ec2: authoritative for %s" % authoritative)
 
@@ -28,11 +28,6 @@ def deinit(id): return True
 
 def inform_super(id, qstate, superqstate, qdata): return True
 
-# forward: ec2.get_all_instances(filters={"tag:example:env": "prod", "instance-state-name": "running", "tag:Name": name})
-# reverse: ec2.get_all_instances(filters={"tag:example:env": "prod", "instance-state-name": "running", "private-ip-address": ipaddr})
-# what about public addrs?
-# http://unbound.net/documentation/pythonmod/modules/struct.html
-# http://jpmens.net/2011/08/09/extending-unbound-with-python-module/
 def operate(id, event, qstate, qdata):
     global authoritative
     
@@ -42,10 +37,6 @@ def operate(id, event, qstate, qdata):
             if qname.endswith(authoritative):
                 log_info("unbound_ec2: handling forward query for %s" % qname)
                 return handle_forward(id, event, qstate, qdata)
-
-        elif (qstate.qinfo.qtype == RR_TYPE_PTR):
-            # XXX what if we don't know?
-            return handle_reverse(id, event, qstate, qdata)
 
         # Fall through; pass on this request.    
         return handle_pass(id, event, qstate, qdata)
@@ -59,7 +50,6 @@ def handle_forward(id, event, qstate, qdata):
     global ttl
     
     name = qstate.qinfo.qname_str
-    
     msg = DNSMessage(qstate.qinfo.qname_str, RR_TYPE_A, RR_CLASS_IN, PKT_QR | PKT_RA | PKT_AA)
 
     reservations = ec2.get_all_instances(filters={
@@ -84,10 +74,6 @@ def handle_forward(id, event, qstate, qdata):
 
     qstate.return_msg.rep.security = 2
     qstate.ext_state[id] = MODULE_FINISHED 
-    return True
-
-def handle_reverse(id, event, qstate, qdata):
-    msg.answer.append("140.135.55.23.in-addr.arpa. 300	IN	PTR	a23-55-135-140.deploy.static.akamaitechnologies.com.")
     return True
 
 def handle_pass(id, event, qstate, qdata):
