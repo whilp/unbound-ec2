@@ -38,7 +38,7 @@ def init(id, cfg):
     AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
     ZONE = os.environ.get("ZONE", ".example.com.")
     TTL = os.environ.get("TTL", "300")
-    ec2 = boto.ec2.connect_to_region(region)
+    ec2 = boto.ec2.connect_to_region(AWS_REGION)
 
     if not ZONE.endswith("."):
         ZONE += "."
