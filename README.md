@@ -27,6 +27,30 @@ foo.example.com. 60 IN  A   10.0.0.1
 ;; MSG SIZE  rcvd: 61
 ```
 
+```
+$ dig -p 5003 @127.0.0.1 foo.dev.example.com
+[1380410835] unbound[25204:0] info: unbound_ec2: handling forward query for foo.dev.example.com.
+
+; <<>> DiG 9.8.1-P1 <<>> -p 5003 @127.0.0.1 foo.dev.example.com
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 5696
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;foo.dev.example.com.	IN	A
+
+;; ANSWER SECTION:
+foo.dev.example.com. 300 IN	A	10.0.0.2
+foo.dev.example.com. 300 IN	A	10.0.0.1
+
+;; Query time: 81 msec
+;; SERVER: 127.0.0.1#5003(127.0.0.1)
+;; WHEN: Sat Sep 28 23:27:16 2013
+;; MSG SIZE  rcvd: 77
+```
+
 ## Installation
 
 On Ubuntu, install the `unbound`, `python-unbound`, and `python-boto` system packages. Then, install `unbound_ec2`:
