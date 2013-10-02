@@ -118,6 +118,6 @@ def handle_error(id, event, qstate, qdata):
 
 def envdir(path):
     for key in os.listdir(path):
-        with open(os.path.join(envdir, key), "r") as f:
+        with open(os.path.join(path, key), "r") as f:
             value = f.read()
             os.environ[key] = value
