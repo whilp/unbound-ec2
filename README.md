@@ -45,13 +45,14 @@ python:
     python-script: "/path/to/unbound_ec2.py"
 ```
 
-You'll also probably want to set some configuration specific to `unbound_ec2`:
+You'll also probably want to set some configuration specific to `unbound_ec2`; on Ubuntu:
 
 ```
-sudo mkdir -p /etc/unbound/env
-echo -n yourdomain.instead.of.example.com | sudo tee /etc/unbound/env/ZONE > /dev/null
-echo -n 60 | sudo tee /etc/unbound/env/TTL > /dev/null
-echo -n us-west-2 | sudo tee /etc/unbound/env/AWS_REGION > /dev/null
+cat <<EOF | sudo tee -a /etc/default/unbound > /dev/null
+export ZONE=yourdomain.instead.of.example.com
+export TTL=60
+export AWS_REGION=us-west-2
+EOF
 ```
 
 You can also define `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY` entries in the environment directory. When `unbound_ec2` is run on an EC2 instance, though, it will automatically use an IAM instance profile if one is available.
