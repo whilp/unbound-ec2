@@ -20,8 +20,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 import os
 import random
 
-import boto.ec2
-
 envdir_path = "/etc/unbound/env"
 AWS_REGION = None
 ZONE = None
@@ -36,6 +34,9 @@ def init(id, cfg):
 
     if os.path.isdir(envdir_path):    
         envdir(envdir_path)
+
+    # Import boto after envdir runs in case caller sets PYTHONPATH.    
+    import boto.ec2
 
     AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
     ZONE = os.environ.get("ZONE", ".example.com.")
