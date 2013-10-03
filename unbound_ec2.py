@@ -20,7 +20,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 import os
 import random
 
-envdir_path = "/etc/unbound/env"
+import boto.ec2
+
 AWS_REGION = None
 ZONE = None
 TTL = None
@@ -31,12 +32,6 @@ def init(id, cfg):
     global ZONE
     global TTL
     global ec2
-
-    if os.path.isdir(envdir_path):    
-        envdir(envdir_path)
-
-    # Import boto after envdir runs in case caller sets PYTHONPATH.    
-    import boto.ec2
 
     AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
     ZONE = os.environ.get("ZONE", ".example.com.")
@@ -116,9 +111,3 @@ def handle_error(id, event, qstate, qdata):
     log_err("unbound_ec2: bad event")
     qstate.ext_state[id] = MODULE_ERROR
     return True
-
-def envdir(path):
-    for key in os.listdir(path):
-        with open(os.path.join(path, key), "r") as f:
-            value = f.read()
-            os.environ[key] = value
