@@ -33,8 +33,8 @@ def init(id, cfg):
     global TTL
     global ec2
 
-    AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
-    ZONE = os.environ.get("ZONE", ".example.com.")
+    AWS_REGION = os.environ.get("AWS_REGION", "us-east-1").encode("ascii")
+    ZONE = os.environ.get("ZONE", ".example.com.").encode("ascii")
     TTL = int(os.environ.get("TTL", "300"))
     ec2 = boto.ec2.connect_to_region(AWS_REGION)
 
