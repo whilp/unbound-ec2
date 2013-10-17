@@ -21,6 +21,7 @@ import os
 import random
 
 import boto.ec2
+import boto.https_connection as https
 
 AWS_REGION = None
 ZONE = None
@@ -111,3 +112,50 @@ def handle_error(id, event, qstate, qdata):
     log_err("unbound_ec2: bad event")
     qstate.ext_state[id] = MODULE_ERROR
     return True
+
+
+class Connection(https.CertValidatingHTTPSConnection):
+    """An EC2 connection.
+
+    This implementation supports odd cases where `host` is the correct
+    name (or address) for the server but another name should be used to
+    validate the server's certificate. Then, `hostname` is used
+    instead. This is necessary when `host` is an IP address.
+    """
+
+    def __init__(self,
+                 host,
+                 hostname=None,
+                 **kwargs):
+        self.hostname = hostname
+        https.CertValidatingHTTPSConnection.__init__(self, host, **kwargs)
+
+    def connect(self):
+        try:
+            https.CertValidatingHTTPSConnection.connect(self)
+        except https.InvalidCertificateException, e:
+            if not https.ValidateCertificateHostname(e.cert, self.hostname):
+                raise
+
+def conn_factory(hostname=None, ca_certificates_file=None):
+    def factory(host, **kwargs):
+        return Connection(
+            host,
+            hostname=hostname,
+            ca_certs=ca_certificates_file,
+            **kwargs)
+    return factory, ()
+
+def connect_to_ec2(endpoint, address=None, ca_certificates_file=None):
+    if not address:
+        address = endpoint
+    region = boto.ec2.RegionInfo(
+        endpoint=address,
+        )
+    return boto.ec2.EC2Connection(
+        region=region,
+        https_connection_factory=conn_factory(
+            hostname=endpoint,
+            ca_certificates_file=ca_certificates_file,
+            ),
+    )
