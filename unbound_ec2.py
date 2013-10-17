@@ -23,26 +23,43 @@ import random
 import boto.ec2
 import boto.https_connection as https
 
-AWS_REGION = None
+from boto import config
+
+EC2_ENDPOINT = None
+EC2_ENDPOINT_ADDRESS = None
 ZONE = None
 TTL = None
 ec2 = None
 
 def init(id, cfg):
-    global AWS_REGION
+    global EC2_ENDPOINT
+    global EC2_ENDPOINT_ADDRESS
     global ZONE
     global TTL
     global ec2
 
+    EC2_ENDPOINT = os.environ.get("EC2_ENDPOINT", "ec2.us-east-1.amazonaws.com").encode("ascii")
+    EC2_ENDPOINT_ADDRESS = os.environ.get("EC2_ENDPOINT_ADDRESS", "").encode("ascii")
     AWS_REGION = os.environ.get("AWS_REGION", "us-east-1").encode("ascii")
     ZONE = os.environ.get("ZONE", ".example.com.").encode("ascii")
     TTL = int(os.environ.get("TTL", "300"))
-    ec2 = boto.ec2.connect_to_region(AWS_REGION)
+
+    ca_certificates_file = config.get_value(
+        'Boto',
+        'ca_certificates_file',
+        boto.connection.DEFAULT_CA_CERTS_FILE
+    )
+
+    ec2 = connect_to_ec2(
+        endpoint=EC2_ENDPOINT,
+        address=EC2_ENDPOINT_ADDRESS,
+        ca_certificates_file=ca_certificates_file,
+    )
 
     if not ZONE.endswith("."):
         ZONE += "."
 
-    log_info("unbound_ec2: connected to AWS region %s" % AWS_REGION)
+    log_info("unbound_ec2: connected to EC2 endpoint %s" % EC2_ENDPOINT)
     log_info("unbound_ec2: authoritative for zone %s" % ZONE)
 
     return True
