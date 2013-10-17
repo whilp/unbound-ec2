@@ -51,7 +51,7 @@ You'll also probably want to set some configuration specific to `unbound_ec2`; o
 cat <<EOF | sudo tee -a /etc/default/unbound > /dev/null
 export ZONE=yourdomain.instead.of.example.com
 export TTL=60
-export AWS_REGION=us-west-2
+export EC2_ENDPOINT=ec2.us-west-2.amazonaws.com
 EOF
 ```
 
