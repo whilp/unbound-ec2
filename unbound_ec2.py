@@ -88,7 +88,7 @@ def operate(id, event, qstate, qdata):
 
 
 def determine_address(instance):
-    if 'Address' in instance.tags():
+    if 'Address' in instance.tags:
         # the user specified a desired IP.
         ip = instance.tags['Address']
     else:
