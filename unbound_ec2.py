@@ -70,7 +70,7 @@ def inform_super(id, qstate, superqstate, qdata): return True
 
 def operate(id, event, qstate, qdata):
     global ZONE
-    
+
     if (event == MODULE_EVENT_NEW) or (event == MODULE_EVENT_PASS):
         if (qstate.qinfo.qtype == RR_TYPE_A) or (qstate.qinfo.qtype == RR_TYPE_ANY):
             qname = qstate.qinfo.qname_str
@@ -78,7 +78,7 @@ def operate(id, event, qstate, qdata):
                 log_info("unbound_ec2: handling forward query for %s" % qname)
                 return handle_forward(id, event, qstate, qdata)
 
-        # Fall through; pass on this request.    
+        # Fall through; pass on this request.
         return handle_pass(id, event, qstate, qdata)
 
     if event == MODULE_EVENT_MODDONE:
@@ -88,7 +88,7 @@ def operate(id, event, qstate, qdata):
 
 def handle_forward(id, event, qstate, qdata):
     global TTL
-    
+
     qname = qstate.qinfo.qname_str
     msg = DNSMessage(qname, RR_TYPE_A, RR_CLASS_IN, PKT_QR | PKT_RA | PKT_AA)
 
@@ -110,22 +110,22 @@ def handle_forward(id, event, qstate, qdata):
             msg.answer.append(record)
 
     if not msg.set_return_msg(qstate):
-        qstate.ext_state[id] = MODULE_ERROR 
+        qstate.ext_state[id] = MODULE_ERROR
         return True
 
     qstate.return_msg.rep.security = 2
-    qstate.ext_state[id] = MODULE_FINISHED 
+    qstate.ext_state[id] = MODULE_FINISHED
     return True
 
 def handle_pass(id, event, qstate, qdata):
-    qstate.ext_state[id] = MODULE_WAIT_MODULE 
+    qstate.ext_state[id] = MODULE_WAIT_MODULE
     return True
 
 def handle_finished(id, event, qstate, qdata):
-    qstate.ext_state[id] = MODULE_FINISHED 
+    qstate.ext_state[id] = MODULE_FINISHED
     return True
 
-def handle_error(id, event, qstate, qdata):      
+def handle_error(id, event, qstate, qdata):
     log_err("unbound_ec2: bad event")
     qstate.ext_state[id] = MODULE_ERROR
     return True
