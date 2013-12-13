@@ -86,6 +86,16 @@ def operate(id, event, qstate, qdata):
 
     return handle_error(id, event, qstate, qdata)
 
+
+def determine_address(instance):
+    if 'Address' in instance.tags():
+        # the user specified a desired IP.
+        ip = instance.tags['Address']
+    else:
+        ip = (instance.ip_address or instance.private_ip_address)
+    return ip.encode("ascii")
+
+
 def handle_forward(id, event, qstate, qdata):
     global TTL
 
@@ -105,7 +115,7 @@ def handle_forward(id, event, qstate, qdata):
         qstate.return_rcode = RCODE_NOERROR
         random.shuffle(instances)
         for instance in instances:
-            address = (instance.ip_address or instance.private_ip_address).encode("ascii")
+            address = determine_address(instance)
             record = "%s %d IN A %s" % (qname, TTL, address)
             msg.answer.append(record)
 
