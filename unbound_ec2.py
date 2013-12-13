@@ -88,12 +88,9 @@ def operate(id, event, qstate, qdata):
 
 
 def determine_address(instance):
-    if 'Address' in instance.tags:
-        # the user specified a desired IP.
-        ip = instance.tags['Address']
-    else:
-        ip = (instance.ip_address or instance.private_ip_address)
-    return ip.encode("ascii")
+    return (instance.tags.get('Address')
+            or instance.ip_address
+            or instance.private_ip_address).encode("ascii")
 
 
 def handle_forward(id, event, qstate, qdata):
